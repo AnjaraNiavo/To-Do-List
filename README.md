@@ -366,5 +366,5 @@ Ce projet est sous licence **MIT**. Voir le fichier [LICENSE](./LICENSE) pour pl
 ---
 
 <div align="center">
-  <p>Fait avec 🩷 par l'équipe Ataksi</p>
+  <p>Fait par Anjara Niavo</p>
 </div>
