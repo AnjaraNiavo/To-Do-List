@@ -1,4 +1,4 @@
-# at🩷ksi — Task & Project Management
+# TaskFlow — Task & Project Management
 
 > **Ataksi** est une application SaaS de gestion de tâches et de projets, construite avec Django REST Framework en backend et React + Tailwind CSS en frontend.
 
