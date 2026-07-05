@@ -73,15 +73,28 @@ def register(request):
     )
 
 
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils.decorators import method_decorator
+
 @api_view(["POST"])
 @permission_classes([AllowAny])
+@ensure_csrf_cookie
 def user_login(request):
     """POST /api/auth/login/ → se connecter et récupérer un token de session."""
 
-    username = request.data.get("username")
+    username_or_email = request.data.get("username")
     password = request.data.get("password")
 
-    user = authenticate(request, username=username, password=password)
+    # Essayer d'abord avec le username
+    user = authenticate(request, username=username_or_email, password=password)
+
+    # Si ça échoue, essayer de trouver l'utilisateur par son email
+    if user is None and "@" in username_or_email:
+        try:
+            user_obj = User.objects.get(email=username_or_email)
+            user = authenticate(request, username=user_obj.username, password=password)
+        except User.DoesNotExist:
+            user = None
 
     if user is None:
         return Response(
@@ -106,6 +119,16 @@ def user_logout(request):
     """POST /api/auth/logout/ → se déconnecter."""
     logout(request)
     return Response({"message": "Déconnecté avec succès."})
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_me(request):
+    """GET /api/auth/me/ → récupérer les infos de l'utilisateur connecté."""
+    return Response({
+        "id":       request.user.id,
+        "username": request.user.username,
+        "email":    request.user.email,
+    })
 
 
 @api_view(["GET","POST"])

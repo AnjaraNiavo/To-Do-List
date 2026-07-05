@@ -7,6 +7,7 @@ urlpatterns = [
     path("auth/register/", views.register,    name="auth-register"),
     path("auth/login/",    views.user_login,  name="auth-login"),
     path("auth/logout/",   views.user_logout, name="auth-logout"),
+    path("auth/me/",       views.get_me,      name="auth-me"),
 
     # ── Tâches ───────────────────────────────────────────────
     path("tasks/",           views.task_list,   name="task-list"),
