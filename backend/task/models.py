@@ -124,6 +124,7 @@ class Task (models.Model):
 
     # Planification
     due_date = models.DateTimeField(null = True, blank = True)
+    estimated_time = models.CharField(max_length=100, blank=True, default="")
 
     #Sert à mémoriser l'ordre choisi par l'utilisateur 
     position = models.PositiveBigIntegerField(default = 0, db_index= True)

@@ -90,7 +90,7 @@ class TaskSerializer(serializers.ModelSerializer):
             # Contenu
             "title", "description",
             # Classification
-            "priority", "category", "status",
+            "priority", "category", "status", "estimated_time",
             # Planification
             "due_date", "position",
             # Horodatage
@@ -182,7 +182,7 @@ class TaskListSerializer (serializers.ModelSerializer):
     class Meta :
         model = Task
         fields = [
-            "id", "title", "priority", "category", "status",
+            "id", "title", "priority", "category", "status", "estimated_time",
             "due_date", "position", "project_name", "tags",
             "comment_count", "created_at", "completed_at",
         ]
