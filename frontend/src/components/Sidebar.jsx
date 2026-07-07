@@ -9,16 +9,18 @@ import api from '../api/axios'
 
 const NAV = [
   { icon: LayoutDashboard, label: 'Dashboard',  to: '/dashboard' },
-  { icon: CheckSquare,      label: 'All Task',   to: '/tasks' },
-  { icon: Calendar,         label: 'Calendar',   to: '/calendar' },
-  { icon: MessageCircle,    label: 'Message',    to: '/messages' },
-  { icon: Settings,         label: 'Settings',   to: '/settings' },
+  { icon: CheckSquare,      label: 'Toutes les tâches',   to: '/tasks' },
+  { icon: Calendar,         label: 'Calendrier',   to: '/calendar' },
+  { icon: MessageCircle,    label: 'Messages',    to: '/messages' },
 ]
 
 export default function Sidebar() {
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const [user, setUser] = useState({ username: '...', email: '...' })
+  const [showProfileMenu, setShowProfileMenu] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [countdown, setCountdown] = useState(15)
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -32,7 +34,23 @@ export default function Sidebar() {
     fetchUser()
   }, [])
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
+    if (isLoggingOut) return
+    setIsLoggingOut(true)
+    
+    let timeLeft = 10
+    const interval = setInterval(() => {
+      timeLeft -= 1
+      setCountdown(timeLeft)
+      
+      if (timeLeft <= 0) {
+        clearInterval(interval)
+        performLogout()
+      }
+    }, 1000)
+  }
+
+  const performLogout = async () => {
     try {
       await api.post('/auth/logout/')
       navigate('/login')
@@ -70,42 +88,45 @@ export default function Sidebar() {
         
       {/* Section TEAMS supprimée */}
 
-      {/* Section FAVORITES */}
-      <div className="mt-8">
-        <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase px-2 mb-3">Favorites</p>
 
-        <Link to="#" className="flex items-center gap-2.5 px-2 py-2 rounded-xl hover:bg-green-50 transition-colors group">
-          <div className="w-6 h-6 rounded-lg bg-emerald-500 flex items-center justify-center">
-            <Star size={12} className="text-white fill-white" />
+      {/* Footer utilisateur */}
+      <div className="mt-auto pt-6 border-t border-gray-100 px-2 relative">
+        {/* Menu flottant (Popover) */}
+        {showProfileMenu && (
+          <div className="absolute bottom-full left-0 mb-2 w-full bg-white rounded-2xl shadow-xl border border-gray-100 p-2 animate-in fade-in slide-in-from-bottom-2 duration-200 z-30">
+            <Link 
+              to="/settings"
+              onClick={() => setShowProfileMenu(false)}
+              className="flex items-center gap-3 px-3 py-2.5 text-gray-700 hover:bg-violet-50 hover:text-violet-600 rounded-xl text-sm font-medium transition-colors"
+            >
+              <Settings size={16} />
+              Modifier profil
+            </Link>
+            <button 
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors mt-1
+                ${isLoggingOut 
+                  ? 'bg-gray-50 text-gray-400 cursor-wait' 
+                  : 'text-rose-500 hover:bg-rose-50'}`}
+            >
+              <LogOut size={16} className={isLoggingOut ? 'animate-spin' : ''} />
+              {isLoggingOut ? `Déconnexion` : 'Déconnexion'}
+            </button>
           </div>
-          <span className="text-sm font-medium text-gray-600 group-hover:text-emerald-600">Rewardino</span>
-        </Link>
+        )}
 
-        <Link to="#" className="flex items-center gap-2.5 px-2 py-2 rounded-xl hover:bg-rose-50 transition-colors group">
-          <div className="w-6 h-6 rounded-lg bg-rose-500 flex items-center justify-center">
-            <Star size={12} className="text-white fill-white" />
-          </div>
-          <span className="text-sm font-medium text-gray-600 group-hover:text-rose-600">Spexcircle</span>
-        </Link>
-      </div>
-
-      {/* Footer utilisateur avec Logout */}
-      <div className="mt-auto pt-6 border-t border-gray-100 px-2 flex flex-col gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm uppercase">
+        <button 
+          onClick={() => setShowProfileMenu(!showProfileMenu)}
+          className={`flex items-center gap-3 w-full p-2 rounded-2xl transition-all duration-200 
+            ${showProfileMenu ? 'bg-gray-50' : 'hover:bg-gray-50'}`}
+        >
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm uppercase flex-shrink-0 shadow-sm">
             {user.username[0]}
           </div>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1 text-left">
             <p className="text-sm font-semibold text-gray-800 truncate">{user.username}</p>
-            <p className="text-[10px] text-gray-400 truncate">{user.email}</p>
           </div>
-        </div>
-        <button 
-          onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-2 text-rose-500 hover:bg-rose-50 rounded-xl text-sm font-semibold transition-colors group"
-        >
-          <LogOut size={16} className="group-hover:rotate-12 transition-transform" />
-          Déconnexion
         </button>
       </div>
     </aside>

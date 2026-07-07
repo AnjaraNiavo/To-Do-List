@@ -47,7 +47,7 @@ function Sparkline() {
   )
 }
 
-export default function TimeManagement() {
+export default function TimeManagement({ refreshKey }) {
   const [stats, setStats] = useState({ 
     total: 0, completed: 0, completion_pct: 0, pending: 0, in_progress: 0 
   })
@@ -62,30 +62,30 @@ export default function TimeManagement() {
       }
     }
     fetchStats()
-  }, [])
+  }, [refreshKey])
 
   return (
-    <div className="card fade-in">
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-base font-bold text-gray-900">Statistiques</h2>
-        <span className="text-xs bg-emerald-100 text-emerald-600 font-semibold px-2 py-1 rounded-full">Global</span>
+    <div className="bg-white rounded-[2rem] p-4 shadow-card border border-gray-50 fade-in">
+      <div className="flex items-center justify-between mb-2">
+        <h2 className="text-sm font-bold text-gray-900">Statistiques</h2>
+        <span className="text-[10px] bg-emerald-100 text-emerald-600 font-semibold px-1.5 py-0.5 rounded-full">Global</span>
       </div>
 
-      <div className="flex items-end gap-3 mb-4">
-        <span className="text-3xl font-extrabold text-gray-900">{stats.completion_pct}%</span>
-        <span className="text-sm font-semibold text-emerald-500 mb-1 flex items-center gap-0.5">
+      <div className="flex items-end gap-2 mb-2">
+        <span className="text-2xl font-extrabold text-gray-900">{stats.completion_pct}%</span>
+        <span className="text-[10px] font-semibold text-emerald-500 mb-1 flex items-center gap-0.5">
           Terminées
         </span>
       </div>
       
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="bg-gray-50 p-2.5 rounded-xl">
-          <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Total</p>
-          <p className="text-lg font-bold text-gray-800">{stats.total}</p>
+      <div className="grid grid-cols-2 gap-2 mb-3">
+        <div className="bg-gray-50 p-2 rounded-xl">
+          <p className="text-[9px] font-bold text-gray-400 uppercase mb-0.5">Total</p>
+          <p className="text-base font-bold text-gray-800">{stats.total || 0}</p>
         </div>
-        <div className="bg-gray-50 p-2.5 rounded-xl">
-          <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">En cours</p>
-          <p className="text-lg font-bold text-gray-800">{stats.in_progress + stats.pending}</p>
+        <div className="bg-gray-50 p-2 rounded-xl">
+          <p className="text-[9px] font-bold text-gray-400 uppercase mb-0.5">En cours</p>
+          <p className="text-base font-bold text-gray-800">{(stats.in_progress || 0) + (stats.pending || 0)}</p>
         </div>
       </div>
 

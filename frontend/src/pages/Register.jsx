@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Eye, EyeOff, ArrowRight, Mail, Lock, User as UserIcon, Check } from 'lucide-react'
+import { Eye, EyeOff, ArrowRight, Mail, Lock, Check } from 'lucide-react'
 import Logo from '../components/Logo.jsx'
 import api from '../api/axios'
 
@@ -40,7 +40,7 @@ function PasswordStrength({ password }) {
 export default function Register() {
   const navigate  = useNavigate()
   const [show, setShow]     = useState(false)
-  const [form, setForm]     = useState({ username: '', email: '', password: '' })
+  const [form, setForm]     = useState({ email: '', password: '' })
   const [agreed, setAgreed] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -53,9 +53,9 @@ export default function Register() {
     setLoading(true)
     setError('')
     try {
-      await api.post('/auth/register/', form)
+      await api.post('/auth/register/', { username: form.email, email: form.email, password: form.password })
       // Login simple après inscription
-      await api.post('/auth/login/', { username: form.username, password: form.password })
+      await api.post('/auth/login/', { username: form.email, password: form.password })
       navigate('/dashboard')
     } catch (err) {
       setError(err.response?.data?.error || "Erreur lors de l'inscription.")
@@ -66,7 +66,7 @@ export default function Register() {
   }
 
   const socialLogin = (provider) => {
-    alert(`La connexion avec ${provider} nécessite la configuration de client_id sur Google/GitHub Developer Console.`)
+    window.location.href = `http://localhost:8000/api/auth/social/${provider.toLowerCase()}/login/`
   }
 
   return (
@@ -139,21 +139,7 @@ export default function Register() {
           {error && <div className="mb-4 p-3 bg-rose-50 text-rose-500 text-xs font-semibold rounded-xl">{error}</div>}
 
           <form onSubmit={submit} className="flex flex-col gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1.5">Nom d'utilisateur</label>
-              <div className="relative">
-                <UserIcon size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input
-                  type="text"
-                  name="username"
-                  value={form.username}
-                  onChange={handle}
-                  required
-                  placeholder="Ex: anjara"
-                  className="auth-input pl-10"
-                />
-              </div>
-            </div>
+
 
             <div>
               <label className="block text-xs font-semibold text-gray-600 mb-1.5">Email</label>
@@ -165,7 +151,7 @@ export default function Register() {
                   value={form.email}
                   onChange={handle}
                   required
-                  placeholder="vous@exemple.com"
+                  placeholder="email@gmail.com"
                   className="auth-input pl-10"
                 />
               </div>

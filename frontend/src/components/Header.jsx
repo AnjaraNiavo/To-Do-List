@@ -3,7 +3,7 @@ import { Search, Bell, Plus, X, Clock, Tag, Folder } from 'lucide-react'
 import api from '../api/axios'
 import { CATEGORIES } from '../data/data'
 
-export default function Header({ title = 'Dashboard', onSearch = () => {} }) {
+export default function Header({ title = 'Dashboard', onSearch = () => {}, onUpdate = () => {} }) {
   const [showModal, setShowModal] = useState(false)
   const [taskName, setTaskName] = useState('')
   const [estimatedTime, setEstimatedTime] = useState('')
@@ -63,7 +63,7 @@ export default function Header({ title = 'Dashboard', onSearch = () => {} }) {
       setProjectId('')
       setSelectedTags([])
       setShowModal(false)
-      window.location.reload() 
+      onUpdate() // Notifier le dashboard pour rafraîchir les stats et la liste
     } catch (err) {
       console.error(err)
       alert('Erreur lors de la création de la tâche')
@@ -102,10 +102,6 @@ export default function Header({ title = 'Dashboard', onSearch = () => {} }) {
           <button className="relative w-10 h-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center hover:bg-violet-50 transition-colors">
             <Bell size={18} className="text-gray-500" />
             <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white" />
-          </button>
-
-          <button className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm shadow-md uppercase">
-            {user.username[0]}
           </button>
         </div>
       </header>

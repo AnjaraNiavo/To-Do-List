@@ -33,7 +33,8 @@ Ataksi centralise la gestion de vos projets, tâches, équipes et statistiques d
 - 🏷️ Système de tags colorés
 - 💬 Commentaires sur les tâches
 - 📊 Dashboard avec statistiques en temps réel
-- 🔐 Authentification complète (register / login / logout)
+- 🔐 Authentification complète (Email / Mot de passe)
+- 🌐 Connexion sociale (Google & GitHub)
 
 ---
 
@@ -147,8 +148,13 @@ DB_USER=postgres
 DB_PASSWORD=votre_mot_de_passe
 DB_HOST=localhost
 DB_PORT=5432
-SECRET_KEY=votre-cle-secrete-django
 DEBUG=True
+
+# Social Auth (Google & GitHub)
+GOOGLE_CLIENT_ID=votre_id_google
+GOOGLE_CLIENT_SECRET=votre_secret_google
+GITHUB_CLIENT_ID=votre_id_github
+GITHUB_CLIENT_SECRET=votre_secret_github
 ```
 
 > ⚠️ Ne commitez jamais votre `.env` en production. Changez `SECRET_KEY` et passez `DEBUG=False`.
@@ -234,6 +240,8 @@ Tous les endpoints sont préfixés par `/api/`.
 | `POST`  | `/api/auth/register/` | Créer un compte utilisateur     | ❌  |
 | `POST`  | `/api/auth/login/`    | Se connecter (session Django)   | ❌  |
 | `POST`  | `/api/auth/logout/`   | Se déconnecter                  | ✅  |
+| `POST`  | `/api/auth/google/`   | Connexion / Inscription Google  | ❌  |
+| `POST`  | `/api/auth/github/`   | Connexion / Inscription GitHub  | ❌  |
 
 ### 📝 Tâches
 
@@ -308,7 +316,6 @@ Tous les endpoints sont préfixés par `/api/`.
 - Section Hero avec gradient violet → rose
 - Prévisualisation du dashboard (mini-mockup)
 - Grille de 6 fonctionnalités
-- 3 témoignages clients
 - Section CTA finale + footer
 
 ### `/login` — Connexion
@@ -320,7 +327,8 @@ Tous les endpoints sont préfixés par `/api/`.
 
 ### `/register` — Inscription
 - Layout 2 colonnes (avantages + formulaire) sur desktop
-- Boutons OAuth
+- Inscription simplifiée par **Email uniquement**
+- Boutons OAuth fonctionnels (Google & GitHub)
 - Indicateur de force du mot de passe (4 niveaux)
 - Checkbox CGU avec liens
 - Social proof (avatars + note 4.9/5)

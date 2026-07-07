@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Eye, EyeOff, ArrowRight, User as UserIcon, Lock } from 'lucide-react'
+import { Eye, EyeOff, ArrowRight, Mail, Lock } from 'lucide-react'
 import Logo from '../components/Logo.jsx'
 import api from '../api/axios'
 
@@ -29,7 +29,8 @@ export default function Login() {
   }
 
   const socialLogin = (provider) => {
-    alert(`La connexion avec ${provider} nécessite la configuration de client_id sur Google/GitHub Developer Console.`)
+    // Redirige vers le backend pour initier le flux OAuth2
+    window.location.href = `http://localhost:8000/api/auth/social/${provider.toLowerCase()}/login/`
   }
 
   return (
@@ -66,16 +67,16 @@ export default function Login() {
 
         <form onSubmit={submit} className="flex flex-col gap-4">
           <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1.5">Nom d'utilisateur ou Email</label>
+            <label className="block text-xs font-semibold text-gray-600 mb-1.5">Email</label>
             <div className="relative">
-              <UserIcon size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
-                  type="text"
+                  type="email"
                   name="username"
                   value={form.username}
                   onChange={handle}
                   required
-                  placeholder="votre_pseudo ou email@exemple.com"
+                  placeholder="email@gmail.com"
                   className="auth-input pl-10"
                 />
             </div>

@@ -1,15 +1,71 @@
 import { useState, useEffect } from 'react'
-import { MessageCircle, Check, Clock, Trash2 } from 'lucide-react'
+import { MessageCircle, Check, Clock, Trash2, Play } from 'lucide-react'
 import api from '../api/axios'
 import { CATEGORIES } from '../data/data'
 
-export default function TodayTasks({ search = '' }) {
+export default function TodayTasks({ search = '', onUpdate = () => {}, refreshKey }) {
   const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(true)
+  const [runningTaskId, setRunningTaskId] = useState(null)
+  const [timeLeft, setTimeLeft] = useState(0)
+
+  // Parsing duration (ex: "30 min", "1h", "45")
+  const parseDuration = (duration) => {
+    if (!duration) return 0
+    const val = parseInt(duration)
+    if (isNaN(val)) return 0
+    
+    if (duration.toLowerCase().includes('h')) return val * 3600
+    if (duration.toLowerCase().includes('min') || duration.toLowerCase().includes('m')) return val * 60
+    return val * 60 // Par défaut en minutes si pas d'unité précisée
+  }
+
+  // Timer interval
+  useEffect(() => {
+    let interval = null
+    if (runningTaskId && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft(prev => prev - 1)
+      }, 1000)
+    } else if (runningTaskId && timeLeft === 0) {
+      // Temps écoulé -> Marquer comme terminée
+      const task = tasks.find(t => t.id === runningTaskId)
+      if (task && task.status !== 'done') {
+        const markAsDone = async () => {
+          try {
+            await api.patch(`/tasks/${task.id}/`, { status: 'done' })
+            setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: 'done' } : t))
+            onUpdate() // Mettre à jour les stats
+          } catch (err) {
+            console.error('Erreur auto-complete:', err)
+          }
+        }
+        markAsDone()
+      }
+      setRunningTaskId(null)
+      clearInterval(interval)
+    }
+    return () => clearInterval(interval)
+  }, [runningTaskId, timeLeft, tasks, onUpdate])
+
+  const formatTime = (seconds) => {
+    const hrs = Math.floor(seconds / 3600)
+    const mins = Math.floor((seconds % 3600) / 60)
+    const secs = seconds % 60
+    return `${hrs.toString().padStart(2, '0')}: ${mins.toString().padStart(2, '0')} : ${secs.toString().padStart(2, '0')}`
+  }
+
+  const startTimer = (task) => {
+    const seconds = parseDuration(task.estimated_time)
+    if (seconds > 0) {
+      setRunningTaskId(task.id)
+      setTimeLeft(seconds)
+    }
+  }
 
   useEffect(() => {
     fetchTasks()
-  }, [])
+  }, [refreshKey])
 
   const fetchTasks = async () => {
     try {
@@ -27,6 +83,7 @@ export default function TodayTasks({ search = '' }) {
     try {
       await api.patch(`/tasks/${task.id}/`, { status: newStatus })
       setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: newStatus } : t))
+      onUpdate() // Notifier le dashboard
     } catch (err) {
       console.error(err)
       alert('Erreur lors de la mise à jour')
@@ -38,6 +95,7 @@ export default function TodayTasks({ search = '' }) {
     try {
       await api.delete(`/tasks/${id}/`)
       setTasks(prev => prev.filter(t => t.id !== id))
+      onUpdate() // Notifier le dashboard
     } catch (err) {
       console.error(err)
       alert('Erreur lors de la suppression')
@@ -93,9 +151,32 @@ export default function TodayTasks({ search = '' }) {
                   {task.title}
                 </span>
                 {task.estimated_time && (
-                  <div className="flex items-center gap-1 mt-0.5 text-[10px] text-gray-400 font-medium">
-                    <Clock size={10} />
-                    <span>{task.estimated_time}</span>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <div className="flex items-center gap-1 text-[10px] text-gray-400 font-medium">
+                      <Clock size={10} />
+                      <span>{task.estimated_time}</span>
+                    </div>
+                    
+                    {!isDone && (
+                      <div className="flex items-center gap-2">
+                        {runningTaskId === task.id ? (
+                          <span className="text-[10px] font-bold text-violet-600 bg-violet-50 px-1.5 py-0.5 rounded animate-pulse">
+                            {formatTime(timeLeft)}
+                          </span>
+                        ) : (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              startTimer(task)
+                            }}
+                            className="flex items-center gap-1 text-[10px] font-bold text-violet-600 hover:text-violet-700 transition-colors"
+                          >
+                            <Play size={10} fill="currentColor" />
+                            <span>COMMENCER</span>
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

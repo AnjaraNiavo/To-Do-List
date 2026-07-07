@@ -1,4 +1,4 @@
-// Logo "ataksi" avec cœur rose
+// Logo "TaskFlow" avec cœur rose
 export default function Logo({ size = 'md' }) {
   const sizes = {
     sm: { text: 'text-lg', heart: 'text-base', wrap: 'gap-1' },
@@ -10,11 +10,11 @@ export default function Logo({ size = 'md' }) {
   return (
     <div className={`flex items-center ${s.wrap}`}>
       <span className={`font-extrabold tracking-tight text-gray-900 ${s.text}`}>
-        at
+        Task
       </span>
       <span className={`${s.heart} leading-none select-none`}>🩷</span>
       <span className={`font-extrabold tracking-tight text-gray-900 ${s.text}`}>
-        ksi
+        Flow
       </span>
     </div>
   )

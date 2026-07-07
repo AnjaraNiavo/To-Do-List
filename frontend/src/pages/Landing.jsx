@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, CheckCircle, Zap, Users, BarChart3, Shield, Star } from 'lucide-react'
+import { CheckCircle, Zap, Users, BarChart3, Shield, Star } from 'lucide-react'
 import Logo from '../components/Logo.jsx'
 
 const FEATURES = [
@@ -11,11 +11,7 @@ const FEATURES = [
   { icon: Star,        color: 'text-pink-500',    bg: 'bg-pink-50',    title: 'Interface premium',    desc: 'Une expérience utilisateur élégante et intuitive pour chaque équipe.' },
 ]
 
-const TESTIMONIALS = [
-  { name: 'Sophie Martin',  role: 'CTO @ Rewardino',   avatar: 'SM', color: 'bg-emerald-500', text: '"Ataksi a transformé notre façon de gérer les projets. Notre productivité a augmenté de 40% en 2 mois !"' },
-  { name: 'Karim Ouali',    role: 'PM @ Spexcircle',   avatar: 'KO', color: 'bg-rose-500',    text: '"L\'interface est magnifique et les fonctionnalités sont exactement ce dont on avait besoin."' },
-  { name: 'Léa Fontaine',   role: 'Lead @ Arify',      avatar: 'LF', color: 'bg-violet-500',  text: '"Enfin un outil qui centralise tout : tâches, timeline, stats. Je ne peux plus m\'en passer."' },
-]
+
 
 export default function Landing() {
   return (
@@ -25,7 +21,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <Logo size="md" />
           <div className="hidden md:flex items-center gap-8">
-            {['Fonctionnalités', 'Tarifs', 'Témoignages', 'À propos'].map(item => (
+            {['Fonctionnalités', 'Tarifs', 'À propos'].map(item => (
               <a key={item} href={`#${item.toLowerCase()}`} className="text-sm font-medium text-gray-500 hover:text-violet-600 transition-colors">{item}</a>
             ))}
           </div>
@@ -34,7 +30,7 @@ export default function Landing() {
               Se connecter
             </Link>
             <Link to="/register" className="btn-primary">
-              Commencer gratuitement
+              Inscription
             </Link>
           </div>
         </div>
@@ -57,18 +53,10 @@ export default function Landing() {
           </h1>
 
           <p className="text-lg md:text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
-            Ataksi est la plateforme tout-en-un pour gérer vos tâches, collaborer avec votre équipe et analyser votre productivité.
+            TaskFlow est la plateforme tout-en-un pour gérer vos tâches, collaborer avec votre équipe et analyser votre productivité.
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            <Link to="/register" className="btn-primary text-base px-8 py-3.5 rounded-2xl">
-              Démarrer maintenant — c'est gratuit
-              <ArrowRight size={18} />
-            </Link>
-            <Link to="/dashboard" className="btn-secondary text-base px-8 py-3.5 rounded-2xl">
-              Voir la démo
-            </Link>
-          </div>
+
 
           {/* Stats */}
           <div className="flex flex-wrap justify-center gap-10 mt-14">
@@ -93,7 +81,7 @@ export default function Landing() {
                 <div className="w-3 h-3 rounded-full bg-emerald-400" />
               </div>
               <div className="flex-1 mx-4 bg-gray-800 rounded-full px-4 py-1 text-xs text-gray-500 text-center">
-                ataksi.app/dashboard
+                taskflow.app/dashboard
               </div>
             </div>
             <div className="bg-surface p-4 aspect-[16/9] flex items-center justify-center">
@@ -101,9 +89,9 @@ export default function Landing() {
               <div className="flex gap-3 w-full h-full">
                 {/* Sidebar mini */}
                 <div className="w-28 bg-white rounded-2xl p-3 flex flex-col gap-2 shadow-card">
-                  <div className="text-xs font-extrabold text-gray-900">at🩷ksi</div>
+                  <div className="text-xs font-extrabold text-gray-900">Task🩷Flow</div>
                   <div className="flex flex-col gap-1 mt-2">
-                    {['Dashboard', 'Tasks', 'Calendar', 'Messages'].map((item, i) => (
+                    {['Dashboard', 'Tâches', 'Calendrier', 'Messages'].map((item, i) => (
                       <div key={item} className={`text-[9px] font-semibold px-2 py-1.5 rounded-lg ${i === 0 ? 'bg-violet-600 text-white' : 'text-gray-400'}`}>{item}</div>
                     ))}
                   </div>
@@ -111,7 +99,7 @@ export default function Landing() {
                 {/* Content mini */}
                 <div className="flex-1 flex flex-col gap-2">
                   <div className="bg-white rounded-2xl p-3 shadow-card flex-1">
-                    <div className="text-[9px] font-bold text-gray-700 mb-2">Today's Tasks</div>
+                    <div className="text-[9px] font-bold text-gray-700 mb-2">Tâches du jour</div>
                     {['Spexcircle Mobile App','Rewardino Marketing','Job Search Feedbacks'].map((t, i) => (
                       <div key={t} className="flex items-center gap-1.5 py-1 border-b border-gray-50 last:border-0">
                         <div className={`w-3 h-3 rounded-full border ${i === 1 ? 'bg-violet-600 border-violet-600' : 'border-gray-300'}`} />
@@ -121,12 +109,12 @@ export default function Landing() {
                   </div>
                   <div className="flex gap-2 flex-1">
                     <div className="flex-1 bg-white rounded-2xl p-3 shadow-card">
-                      <div className="text-[9px] font-bold text-gray-700 mb-1">Time</div>
+                      <div className="text-[9px] font-bold text-gray-700 mb-1">Temps</div>
                       <div className="text-base font-extrabold text-gray-900">7h 28m</div>
                       <div className="text-[8px] text-emerald-500 font-semibold">↑ +27m</div>
                     </div>
                     <div className="flex-1 bg-white rounded-2xl p-3 shadow-card">
-                      <div className="text-[9px] font-bold text-gray-700 mb-2">Projects</div>
+                      <div className="text-[9px] font-bold text-gray-700 mb-2">Projets</div>
                       {[['Rewardino', 'bg-emerald-500', 90], ['Spexcircle', 'bg-rose-500', 67]].map(([n, c, p]) => (
                         <div key={n} className="mb-1">
                           <div className="text-[7px] text-gray-600 font-medium mb-0.5">{n}</div>
@@ -165,44 +153,14 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section id="témoignages" className="py-20 px-6 bg-white">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-14">
-            <h2 className="text-4xl font-extrabold text-gray-900 mb-4">Ils nous font confiance</h2>
-            <p className="text-gray-500 text-lg">Plus de 10 000 équipes utilisent Ataksi chaque jour.</p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {TESTIMONIALS.map(({ name, role, avatar, color, text }) => (
-              <div key={name} className="bg-gray-50 rounded-2xl p-6 border border-gray-100 hover:border-violet-200 transition-colors">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className={`w-10 h-10 rounded-full ${color} flex items-center justify-center text-white font-bold text-sm`}>
-                    {avatar}
-                  </div>
-                  <div>
-                    <div className="text-sm font-bold text-gray-900">{name}</div>
-                    <div className="text-xs text-gray-500">{role}</div>
-                  </div>
-                </div>
-                <div className="flex gap-0.5 mb-3">
-                  {[...Array(5)].map((_, i) => <Star key={i} size={13} className="text-amber-400 fill-amber-400" />)}
-                </div>
-                <p className="text-sm text-gray-600 leading-relaxed italic">{text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+
 
       {/* CTA final */}
       <section className="py-20 px-6 bg-gradient-to-br from-violet-600 to-pink-500">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-4xl font-extrabold text-white mb-4">Prêt à transformer votre productivité ?</h2>
-          <p className="text-violet-200 text-lg mb-8">Rejoignez des milliers d'équipes qui font confiance à Ataksi.</p>
-          <Link to="/register" className="inline-flex items-center gap-2 bg-white text-violet-700 font-bold px-8 py-4 rounded-2xl hover:bg-violet-50 transition-colors shadow-lg text-base">
-            Commencer gratuitement
-            <ArrowRight size={18} />
-          </Link>
+          <p className="text-violet-200 text-lg mb-8">Rejoignez des milliers d'équipes qui font confiance à TaskFlow.</p>
+
         </div>
       </section>
 
@@ -210,7 +168,7 @@ export default function Landing() {
       <footer className="py-10 px-6 bg-gray-900 text-gray-400">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <Logo size="sm" />
-          <p className="text-sm">© 2026 Ataksi. Tous droits réservés.</p>
+          <p className="text-sm">© 2026 TaskFlow. Tous droits réservés.</p>
           <div className="flex gap-6 text-sm">
             {['Confidentialité', 'CGU', 'Contact'].map(l => (
               <a key={l} href="#" className="hover:text-white transition-colors">{l}</a>
