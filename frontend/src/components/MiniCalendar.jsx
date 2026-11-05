@@ -17,14 +17,14 @@ export default function MiniCalendar() {
   const events = [7, 12, 13, 21, 28] // Days with task dots
 
   return (
-    <div className="bg-white rounded-[2rem] p-4 shadow-card border border-gray-50 mt-3 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="card mt-3 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-xs font-extrabold text-gray-900">{monthName}</h3>
+        <h3 className="text-xs font-extrabold text-white">{monthName}</h3>
         <div className="flex gap-1">
-          <button className="p-0.5 hover:bg-gray-50 rounded-lg text-gray-400 hover:text-violet-600 transition-colors">
+          <button className="p-0.5 hover:bg-white/5 rounded-lg text-white/30 hover:text-violet-400 transition-colors">
             <ChevronLeft size={14} />
           </button>
-          <button className="p-0.5 hover:bg-gray-50 rounded-lg text-gray-400 hover:text-violet-600 transition-colors">
+          <button className="p-0.5 hover:bg-white/5 rounded-lg text-white/30 hover:text-violet-400 transition-colors">
             <ChevronRight size={14} />
           </button>
         </div>
@@ -32,7 +32,7 @@ export default function MiniCalendar() {
 
       <div className="grid grid-cols-7 gap-y-1 mb-1">
         {days.map((d, i) => (
-          <div key={i} className="text-[9px] font-bold text-gray-400 text-center uppercase tracking-tighter">
+          <div key={i} className="text-[9px] font-bold text-white/30 text-center uppercase tracking-tighter">
             {d}
           </div>
         ))}
@@ -48,7 +48,7 @@ export default function MiniCalendar() {
               {date && (
                 <>
                   <div className={`w-6 h-6 flex items-center justify-center rounded-lg text-[9px] font-semibold transition-all duration-200
-                    ${isToday ? 'bg-violet-600 text-white shadow-lg shadow-violet-200 scale-110' : 'text-gray-700 hover:bg-violet-50 hover:text-violet-600'}
+                    ${isToday ? 'bg-violet-600 text-white shadow-lg shadow-violet-900/40 scale-110' : 'text-white/70 hover:bg-violet-500/15 hover:text-violet-400'}
                   `}>
                     {date}
                   </div>
@@ -62,10 +62,10 @@ export default function MiniCalendar() {
         })}
       </div>
 
-      <div className="mt-4 pt-4 border-t border-gray-50">
+      <div className="mt-4 pt-4 border-t border-dark">
         <div className="flex items-center justify-between text-[10px]">
-          <span className="text-gray-500 font-medium tracking-tight">Prochain événement</span>
-          <span className="text-violet-600 font-bold bg-violet-50 px-2 py-0.5 rounded-full">12 Juil.</span>
+          <span className="text-white/40 font-medium tracking-tight">Prochain événement</span>
+          <span className="text-violet-400 font-bold bg-violet-500/15 px-2 py-0.5 rounded-full">12 Juil.</span>
         </div>
       </div>
     </div>

@@ -109,6 +109,7 @@ def user_login(request):
             "id":       user.id,
             "username": user.username,
             "email":    user.email,
+            "is_staff": user.is_staff,
         }
     })
 
@@ -128,6 +129,7 @@ def get_me(request):
         "id":       request.user.id,
         "username": request.user.username,
         "email":    request.user.email,
+        "is_staff": request.user.is_staff,
     })
 
 
@@ -176,6 +178,13 @@ def task_list (request):
         return Response(serializer.data)
     
     if request.method == "POST":
+        # L'admin ne peut pas créer de tâches
+        if request.user.is_staff:
+            return Response(
+                {"error": "Les administrateurs ne peuvent pas créer de tâches."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
         serializer = TaskSerializer(data = request.data, context ={"request":request})
 
         if serializer.is_valid():
@@ -427,3 +436,105 @@ def stats(request):
         "completion_pct":     pct,
     })
 
+
+# ── Admin ──────────────────────────────────────────────────
+from rest_framework.permissions import IsAdminUser
+
+from django.db.models import Count, Sum, F, Avg, Q
+from datetime import timedelta
+
+@api_view(["GET"])
+@permission_classes([IsAdminUser])
+def admin_stats(request):
+    """GET /api/admin/stats/ → stats globales pour l'admin."""
+    active_users_count = User.objects.filter(is_active=True).count()
+    if active_users_count == 0:
+        return Response({
+            "active_users": 0,
+            "avg_tasks_created": 0,
+            "avg_tasks_completed": 0,
+            "avg_time_seconds_per_user": 0
+        })
+
+    total_tasks_count = Task.objects.filter(is_deleted=False).count()
+    completed_tasks = Task.objects.filter(status="done", is_deleted=False)
+    total_completed_count = completed_tasks.count()
+    
+    # Temps total passé par tous les utilisateurs
+    total_duration_agg = completed_tasks.annotate(
+        duration=F('completed_at') - F('created_at')
+    ).aggregate(total_time=Sum('duration'))
+    
+    total_time = total_duration_agg['total_time'] or timedelta(0)
+    total_seconds = total_time.total_seconds() if hasattr(total_time, 'total_seconds') else 0
+
+    from django.db.models.functions import TruncDate
+    
+    today = timezone.now().date()
+    last_7_days = today - timedelta(days=6)
+    
+    growth = User.objects.filter(date_joined__date__gte=last_7_days)\
+        .annotate(date=TruncDate('date_joined'))\
+        .values('date')\
+        .annotate(count=Count('id'))\
+        .order_by('date')
+    
+    growth_dict = {item['date']: item['count'] for item in growth}
+    chart_data = []
+    for i in range(7):
+        d = last_7_days + timedelta(days=i)
+        chart_data.append({
+            "date": d.strftime("%d/%m"),
+            "count": growth_dict.get(d, 0)
+        })
+
+    return Response({
+        "active_users":        active_users_count,
+        "avg_tasks_created":   round(total_tasks_count / active_users_count, 1),
+        "avg_tasks_completed": round(total_completed_count / active_users_count, 1),
+        "avg_time_seconds_per_user": round(total_seconds / active_users_count, 1),
+        "chart_data":          chart_data
+    })
+
+@api_view(["GET"])
+@permission_classes([IsAdminUser])
+def admin_users(request):
+    """GET /api/admin/users/ → liste détaillée des utilisateurs."""
+    users = User.objects.all().order_by("-date_joined")
+    data = []
+    
+    for u in users:
+        tasks = Task.objects.filter(owner=u, is_deleted=False)
+        completed_tasks = tasks.filter(status="done")
+        
+        # Calcul temps total passé par cet utilisateur sur ses tâches terminées
+        duration_agg = completed_tasks.annotate(
+            duration=F('completed_at') - F('created_at')
+        ).aggregate(total=Sum('duration'))
+        
+        total_seconds = duration_agg['total'].total_seconds() if duration_agg['total'] else 0
+        
+        data.append({
+            "id":                u.id,
+            "username":          u.username,
+            "email":             u.email,
+            "tasks_created":     tasks.count(),
+            "tasks_completed":   completed_tasks.count(),
+            "total_time_seconds": total_seconds,
+            "date_joined":       u.date_joined,
+        })
+    
+    return Response(data)
+
+@api_view(["PATCH", "DELETE"])
+@permission_classes([IsAdminUser])
+def admin_user_detail(request, pk):
+    """PATCH or DELETE /api/admin/users/{id}/"""
+    try:
+        user = User.objects.get(pk=pk)
+    except User.DoesNotExist:
+        return Response({"error": "Utilisateur introuvable."}, status=404)
+
+    if request.method == "DELETE":
+        user.delete()
+        return Response({"message": "Utilisateur supprimé."}, status=status.HTTP_204_NO_CONTENT)

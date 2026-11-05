@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, CheckSquare, Calendar, MessageCircle,
-  Settings, Plus, LogOut, Star,
+  Settings, Plus, LogOut, Star, ShieldCheck,
 } from 'lucide-react'
 import Logo from './Logo.jsx'
 import api from '../api/axios'
@@ -61,9 +61,9 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="w-60 min-h-screen bg-white flex flex-col py-6 px-4 shadow-[1px_0_0_#f0f0f5] flex-shrink-0">
+    <aside className="w-60 min-h-screen bg-surface-dark flex flex-col py-6 px-4 border-r border-dark flex-shrink-0">
       <div className="px-2 mb-8">
-        <Logo size="md" />
+        <Logo size="md" variant="light" />
       </div>
 
       <nav className="flex flex-col gap-1">
@@ -75,8 +75,8 @@ export default function Sidebar() {
               to={to}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all duration-150 group
                 ${active
-                  ? 'bg-violet-600 text-white shadow-md shadow-violet-200'
-                  : 'text-gray-500 hover:bg-violet-50 hover:text-violet-600'
+                  ? 'bg-violet-600 text-white shadow-md shadow-violet-900/40'
+                  : 'text-white/50 hover:bg-white/5 hover:text-violet-400'
                 }`}
             >
               <Icon size={18} strokeWidth={active ? 2.5 : 1.8} />
@@ -90,14 +90,13 @@ export default function Sidebar() {
 
 
       {/* Footer utilisateur */}
-      <div className="mt-auto pt-6 border-t border-gray-100 px-2 relative">
-        {/* Menu flottant (Popover) */}
+      <div className="mt-auto pt-6 border-t border-dark px-2 relative">
         {showProfileMenu && (
-          <div className="absolute bottom-full left-0 mb-2 w-full bg-white rounded-2xl shadow-xl border border-gray-100 p-2 animate-in fade-in slide-in-from-bottom-2 duration-200 z-30">
+          <div className="absolute bottom-full left-0 mb-2 w-full bg-[#1a1a1e] rounded-2xl shadow-xl border border-dark p-2 animate-in fade-in slide-in-from-bottom-2 duration-200 z-30">
             <Link 
               to="/settings"
               onClick={() => setShowProfileMenu(false)}
-              className="flex items-center gap-3 px-3 py-2.5 text-gray-700 hover:bg-violet-50 hover:text-violet-600 rounded-xl text-sm font-medium transition-colors"
+              className="flex items-center gap-3 px-3 py-2.5 text-white/70 hover:bg-violet-500/10 hover:text-violet-400 rounded-xl text-sm font-medium transition-colors"
             >
               <Settings size={16} />
               Modifier profil
@@ -107,8 +106,8 @@ export default function Sidebar() {
               disabled={isLoggingOut}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors mt-1
                 ${isLoggingOut 
-                  ? 'bg-gray-50 text-gray-400 cursor-wait' 
-                  : 'text-rose-500 hover:bg-rose-50'}`}
+                  ? 'bg-white/5 text-white/30 cursor-wait' 
+                  : 'text-rose-400 hover:bg-rose-500/10'}`}
             >
               <LogOut size={16} className={isLoggingOut ? 'animate-spin' : ''} />
               {isLoggingOut ? `Déconnexion` : 'Déconnexion'}
@@ -119,13 +118,13 @@ export default function Sidebar() {
         <button 
           onClick={() => setShowProfileMenu(!showProfileMenu)}
           className={`flex items-center gap-3 w-full p-2 rounded-2xl transition-all duration-200 
-            ${showProfileMenu ? 'bg-gray-50' : 'hover:bg-gray-50'}`}
+            ${showProfileMenu ? 'bg-white/5' : 'hover:bg-white/5'}`}
         >
           <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm uppercase flex-shrink-0 shadow-sm">
             {user.username[0]}
           </div>
           <div className="min-w-0 flex-1 text-left">
-            <p className="text-sm font-semibold text-gray-800 truncate">{user.username}</p>
+            <p className="text-sm font-semibold text-white truncate">{user.username}</p>
           </div>
         </button>
       </div>

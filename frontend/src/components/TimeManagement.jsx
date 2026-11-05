@@ -40,7 +40,7 @@ function Sparkline() {
 
       <div className="flex justify-between mt-1 px-1">
         {['Mon','Tue','Wed','Thu','Fri'].map(d => (
-          <span key={d} className="text-[10px] text-gray-400 font-medium">{d}</span>
+          <span key={d} className="text-[10px] text-white/30 font-medium">{d}</span>
         ))}
       </div>
     </div>
@@ -65,27 +65,27 @@ export default function TimeManagement({ refreshKey }) {
   }, [refreshKey])
 
   return (
-    <div className="bg-white rounded-[2rem] p-4 shadow-card border border-gray-50 fade-in">
+    <div className="card fade-in">
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-sm font-bold text-gray-900">Statistiques</h2>
-        <span className="text-[10px] bg-emerald-100 text-emerald-600 font-semibold px-1.5 py-0.5 rounded-full">Global</span>
+        <h2 className="text-sm font-bold text-white">Statistiques</h2>
+        <span className="text-[10px] bg-emerald-500/15 text-emerald-400 font-semibold px-1.5 py-0.5 rounded-full">Global</span>
       </div>
 
       <div className="flex items-end gap-2 mb-2">
-        <span className="text-2xl font-extrabold text-gray-900">{stats.completion_pct}%</span>
-        <span className="text-[10px] font-semibold text-emerald-500 mb-1 flex items-center gap-0.5">
+        <span className="text-2xl font-extrabold text-white">{stats.completion_pct}%</span>
+        <span className="text-[10px] font-semibold text-emerald-400 mb-1 flex items-center gap-0.5">
           Terminées
         </span>
       </div>
       
       <div className="grid grid-cols-2 gap-2 mb-3">
-        <div className="bg-gray-50 p-2 rounded-xl">
-          <p className="text-[9px] font-bold text-gray-400 uppercase mb-0.5">Total</p>
-          <p className="text-base font-bold text-gray-800">{stats.total || 0}</p>
+        <div className="bg-white/5 p-2 rounded-xl border border-dark">
+          <p className="text-[9px] font-bold text-white/40 uppercase mb-0.5">Total</p>
+          <p className="text-base font-bold text-white">{stats.total || 0}</p>
         </div>
-        <div className="bg-gray-50 p-2 rounded-xl">
-          <p className="text-[9px] font-bold text-gray-400 uppercase mb-0.5">En cours</p>
-          <p className="text-base font-bold text-gray-800">{(stats.in_progress || 0) + (stats.pending || 0)}</p>
+        <div className="bg-white/5 p-2 rounded-xl border border-dark">
+          <p className="text-[9px] font-bold text-white/40 uppercase mb-0.5">En cours</p>
+          <p className="text-base font-bold text-white">{(stats.in_progress || 0) + (stats.pending || 0)}</p>
         </div>
       </div>
 

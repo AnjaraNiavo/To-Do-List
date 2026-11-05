@@ -106,20 +106,20 @@ export default function TodayTasks({ search = '', onUpdate = () => {}, refreshKe
     t.title.toLowerCase().includes(search.toLowerCase())
   )
 
-  if (loading) return <div className="card animate-pulse h-64 bg-gray-50"></div>
+  if (loading) return <div className="card animate-pulse h-64 bg-white/5"></div>
 
   return (
     <div className="card fade-in">
       <div className="flex items-center justify-between mb-5">
-        <h2 className="text-base font-bold text-gray-900">Tâches du jour</h2>
-        <span className="text-xs text-gray-400 font-medium">
+        <h2 className="text-base font-bold text-white">Tâches du jour</h2>
+        <span className="text-xs text-white/40 font-medium">
           {filteredTasks.filter(t => t.status !== 'done').length} missions en cours
         </span>
       </div>
 
       <div className="flex flex-col gap-3">
         {filteredTasks.length === 0 && (
-          <p className="text-center text-sm text-gray-400 py-8">
+          <p className="text-center text-sm text-white/40 py-8">
             {search ? 'Aucun résultat pour cette recherche.' : 'Aucune tâche enregistrée.'}
           </p>
         )}
@@ -131,7 +131,7 @@ export default function TodayTasks({ search = '', onUpdate = () => {}, refreshKe
             <div
               key={task.id}
               className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-200 group
-                ${isDone ? 'opacity-60 bg-gray-50' : 'hover:bg-violet-50/40'}`}
+                ${isDone ? 'opacity-60 bg-white/5' : 'hover:bg-violet-500/10'}`}
             >
               {/* Checkbox */}
               <button
@@ -139,7 +139,7 @@ export default function TodayTasks({ search = '', onUpdate = () => {}, refreshKe
                 className={`w-5.5 h-5.5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all duration-200
                   ${isDone
                     ? 'bg-violet-600 border-violet-600'
-                    : 'border-gray-300 hover:border-violet-400'
+                    : 'border-white/20 hover:border-violet-400'
                   }`}
               >
                 {isDone && <Check size={12} className="text-white" strokeWidth={3} />}
@@ -147,12 +147,12 @@ export default function TodayTasks({ search = '', onUpdate = () => {}, refreshKe
 
               {/* Titre et temps */}
               <div className="flex-1 flex flex-col min-w-0">
-                <span className={`text-sm font-medium transition-all ${isDone ? 'line-through text-gray-400' : 'text-gray-800'}`}>
+                <span className={`text-sm font-medium transition-all ${isDone ? 'line-through text-white/30' : 'text-white/90'}`}>
                   {task.title}
                 </span>
                 {task.estimated_time && (
                   <div className="flex items-center gap-2 mt-0.5">
-                    <div className="flex items-center gap-1 text-[10px] text-gray-400 font-medium">
+                    <div className="flex items-center gap-1 text-[10px] text-white/40 font-medium">
                       <Clock size={10} />
                       <span>{task.estimated_time}</span>
                     </div>
@@ -160,7 +160,7 @@ export default function TodayTasks({ search = '', onUpdate = () => {}, refreshKe
                     {!isDone && (
                       <div className="flex items-center gap-2">
                         {runningTaskId === task.id ? (
-                          <span className="text-[10px] font-bold text-violet-600 bg-violet-50 px-1.5 py-0.5 rounded animate-pulse">
+                          <span className="text-[10px] font-bold text-violet-400 bg-violet-500/15 px-1.5 py-0.5 rounded animate-pulse">
                             {formatTime(timeLeft)}
                           </span>
                         ) : (
@@ -169,7 +169,7 @@ export default function TodayTasks({ search = '', onUpdate = () => {}, refreshKe
                               e.stopPropagation()
                               startTimer(task)
                             }}
-                            className="flex items-center gap-1 text-[10px] font-bold text-violet-600 hover:text-violet-700 transition-colors"
+                            className="flex items-center gap-1 text-[10px] font-bold text-violet-400 hover:text-violet-300 transition-colors"
                           >
                             <Play size={10} fill="currentColor" />
                             <span>COMMENCER</span>
@@ -182,7 +182,7 @@ export default function TodayTasks({ search = '', onUpdate = () => {}, refreshKe
               </div>
 
               {/* Commentaires */}
-              <div className="flex items-center gap-1 text-gray-400 text-xs px-2">
+              <div className="flex items-center gap-1 text-white/30 text-xs px-2">
                 <MessageCircle size={13} />
                 <span>{task.comment_count || 0}</span>
               </div>
@@ -190,7 +190,7 @@ export default function TodayTasks({ search = '', onUpdate = () => {}, refreshKe
               {/* Tags */}
               <div className="hidden md:flex gap-1.5 ml-2">
                 {task.tags?.map(t => (
-                  <span key={t.id} className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-gray-100 text-gray-500">
+                  <span key={t.id} className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-white/10 text-white/50">
                     {t.name.toUpperCase()}
                   </span>
                 ))}
@@ -204,7 +204,7 @@ export default function TodayTasks({ search = '', onUpdate = () => {}, refreshKe
               {/* Bouton Delete */}
               <button
                 onClick={() => deleteTask(task.id)}
-                className="p-1.5 text-gray-300 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                className="p-1.5 text-white/20 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"
               >
                 <Trash2 size={14} />
               </button>

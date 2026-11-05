@@ -3,28 +3,33 @@ from . import views
 
 urlpatterns = [
 
-    # ── Authentification ─────────────────────────────────────
+    # -- Authentification
     path("auth/register/", views.register,    name="auth-register"),
     path("auth/login/",    views.user_login,  name="auth-login"),
     path("auth/logout/",   views.user_logout, name="auth-logout"),
     path("auth/me/",       views.get_me,      name="auth-me"),
 
-    # ── Tâches ───────────────────────────────────────────────
+    # -- Tâches
     path("tasks/",           views.task_list,   name="task-list"),
     path("tasks/<uuid:pk>/", views.task_detail, name="task-detail"),
 
-    # ── Commentaires ─────────────────────────────────────────
+    # -- Commentaires
     path("tasks/<uuid:task_pk>/comments/",                    views.comment_create, name="comment-create"),
     path("tasks/<uuid:task_pk>/comments/<uuid:comment_pk>/",  views.comment_delete, name="comment-delete"),
 
-    # ── Projets ──────────────────────────────────────────────
+    # -- Projets
     path("projects/",            views.project_list,   name="project-list"),
     path("projects/<uuid:pk>/",  views.project_detail, name="project-detail"),
 
-    # ── Tags ─────────────────────────────────────────────────
+    # -- Tags
     path("tags/",            views.tag_list,   name="tag-list"),
     path("tags/<uuid:pk>/",  views.tag_detail, name="tag-detail"),
 
-    # ── Statistiques ─────────────────────────────────────────
+    # -- Statistiques
     path("stats/", views.stats, name="stats"),
+
+    # -- Admin
+    path("admin/stats/",         views.admin_stats,       name="admin-stats"),
+    path("admin/users/",         views.admin_users,       name="admin-users"),
+    path("admin/users/<int:pk>/", views.admin_user_detail, name="admin-user-detail"),
 ]

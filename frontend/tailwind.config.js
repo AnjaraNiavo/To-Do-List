@@ -23,7 +23,9 @@ export default {
           400: '#f472b6',
           500: '#ec4899',
         },
-        surface: '#F5F6FA',
+        surface: '#0B0B0D',
+        'surface-elevated': '#121214',
+        'border-subtle': '#1F1F23',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
