@@ -1,98 +1,216 @@
-import { useState } from 'react'
-import { MessageCircle, Check } from 'lucide-react'
-import { AvatarStack } from './Avatar.jsx'
+import { useState, useEffect } from 'react'
+import { MessageCircle, Check, Clock, Trash2, Play } from 'lucide-react'
+import api from '../api/axios'
+import { CATEGORIES } from '../data/data'
 
-const INITIAL_TASKS = [
-  {
-    id: 1,
-    title: 'Spexcircle Mobile App',
-    done: false,
-    comments: 3,
-    members: ['Anna', 'Bob', 'Carl'],
-    tag: 'Spexcircle',
-    tagColor: 'bg-rose-100 text-rose-600',
-  },
-  {
-    id: 2,
-    title: 'Rewardino Marketing Asset',
-    done: true,
-    comments: 5,
-    members: ['Diana', 'Eve'],
-    tag: 'Rewardino',
-    tagColor: 'bg-emerald-100 text-emerald-600',
-  },
-  {
-    id: 3,
-    title: 'Job Search Feedbacks',
-    done: false,
-    comments: 1,
-    members: ['Frank', 'Grace', 'Hank'],
-    tag: 'Personal',
-    tagColor: 'bg-sky-100 text-sky-600',
-  },
-  {
-    id: 4,
-    title: 'Mainbodhi Blog Page',
-    done: false,
-    comments: 2,
-    members: ['Ivan', 'Judy'],
-    tag: 'Mainbodhi',
-    tagColor: 'bg-amber-100 text-amber-600',
-  },
-]
+export default function TodayTasks({ search = '', onUpdate = () => {}, refreshKey }) {
+  const [tasks, setTasks] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [runningTaskId, setRunningTaskId] = useState(null)
+  const [timeLeft, setTimeLeft] = useState(0)
 
-export default function TodayTasks() {
-  const [tasks, setTasks] = useState(INITIAL_TASKS)
+  // Parsing duration (ex: "30 min", "1h", "45")
+  const parseDuration = (duration) => {
+    if (!duration) return 0
+    const val = parseInt(duration)
+    if (isNaN(val)) return 0
+    
+    if (duration.toLowerCase().includes('h')) return val * 3600
+    if (duration.toLowerCase().includes('min') || duration.toLowerCase().includes('m')) return val * 60
+    return val * 60 // Par défaut en minutes si pas d'unité précisée
+  }
 
-  const toggle = (id) =>
-    setTasks(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t))
+  // Timer interval
+  useEffect(() => {
+    let interval = null
+    if (runningTaskId && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft(prev => prev - 1)
+      }, 1000)
+    } else if (runningTaskId && timeLeft === 0) {
+      // Temps écoulé -> Marquer comme terminée
+      const task = tasks.find(t => t.id === runningTaskId)
+      if (task && task.status !== 'done') {
+        const markAsDone = async () => {
+          try {
+            await api.patch(`/tasks/${task.id}/`, { status: 'done' })
+            setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: 'done' } : t))
+            onUpdate() // Mettre à jour les stats
+          } catch (err) {
+            console.error('Erreur auto-complete:', err)
+          }
+        }
+        markAsDone()
+      }
+      setRunningTaskId(null)
+      clearInterval(interval)
+    }
+    return () => clearInterval(interval)
+  }, [runningTaskId, timeLeft, tasks, onUpdate])
+
+  const formatTime = (seconds) => {
+    const hrs = Math.floor(seconds / 3600)
+    const mins = Math.floor((seconds % 3600) / 60)
+    const secs = seconds % 60
+    return `${hrs.toString().padStart(2, '0')}: ${mins.toString().padStart(2, '0')} : ${secs.toString().padStart(2, '0')}`
+  }
+
+  const startTimer = (task) => {
+    const seconds = parseDuration(task.estimated_time)
+    if (seconds > 0) {
+      setRunningTaskId(task.id)
+      setTimeLeft(seconds)
+    }
+  }
+
+  useEffect(() => {
+    fetchTasks()
+  }, [refreshKey])
+
+  const fetchTasks = async () => {
+    try {
+      const res = await api.get('/tasks/')
+      setTasks(res.data)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const toggle = async (task) => {
+    const newStatus = task.status === 'done' ? 'pending' : 'done'
+    try {
+      await api.patch(`/tasks/${task.id}/`, { status: newStatus })
+      setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: newStatus } : t))
+      onUpdate() // Notifier le dashboard
+    } catch (err) {
+      console.error(err)
+      alert('Erreur lors de la mise à jour')
+    }
+  }
+
+  const deleteTask = async (id) => {
+    if (!window.confirm('Supprimer cette tâche ?')) return
+    try {
+      await api.delete(`/tasks/${id}/`)
+      setTasks(prev => prev.filter(t => t.id !== id))
+      onUpdate() // Notifier le dashboard
+    } catch (err) {
+      console.error(err)
+      alert('Erreur lors de la suppression')
+    }
+  }
+
+  const filteredTasks = tasks.filter(t => 
+    t.title.toLowerCase().includes(search.toLowerCase())
+  )
+
+  if (loading) return <div className="card animate-pulse h-64 bg-white/5"></div>
 
   return (
     <div className="card fade-in">
       <div className="flex items-center justify-between mb-5">
-        <h2 className="text-base font-bold text-gray-900">Today</h2>
-        <span className="text-xs text-gray-400 font-medium">{tasks.filter(t => !t.done).length} remaining</span>
+        <h2 className="text-base font-bold text-white">Tâches du jour</h2>
+        <span className="text-xs text-white/40 font-medium">
+          {filteredTasks.filter(t => t.status !== 'done').length} missions en cours
+        </span>
       </div>
 
       <div className="flex flex-col gap-3">
-        {tasks.map(task => (
-          <div
-            key={task.id}
-            className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-200 group
-              ${task.done ? 'opacity-60 bg-gray-50' : 'hover:bg-violet-50/40'}`}
-          >
-            {/* Checkbox */}
-            <button
-              onClick={() => toggle(task.id)}
-              className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all duration-200
-                ${task.done
-                  ? 'bg-violet-600 border-violet-600'
-                  : 'border-gray-300 hover:border-violet-400'
-                }`}
+        {filteredTasks.length === 0 && (
+          <p className="text-center text-sm text-white/40 py-8">
+            {search ? 'Aucun résultat pour cette recherche.' : 'Aucune tâche enregistrée.'}
+          </p>
+        )}
+        {filteredTasks.map(task => {
+          const isDone = task.status === 'done'
+          const categoryData = CATEGORIES.find(c => c.value === task.category) || CATEGORIES[3]
+          
+          return (
+            <div
+              key={task.id}
+              className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-200 group
+                ${isDone ? 'opacity-60 bg-white/5' : 'hover:bg-violet-500/10'}`}
             >
-              {task.done && <Check size={11} className="text-white" strokeWidth={3} />}
-            </button>
+              {/* Checkbox */}
+              <button
+                onClick={() => toggle(task)}
+                className={`w-5.5 h-5.5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all duration-200
+                  ${isDone
+                    ? 'bg-violet-600 border-violet-600'
+                    : 'border-white/20 hover:border-violet-400'
+                  }`}
+              >
+                {isDone && <Check size={12} className="text-white" strokeWidth={3} />}
+              </button>
 
-            {/* Titre */}
-            <span className={`flex-1 text-sm font-medium ${task.done ? 'line-through text-gray-400' : 'text-gray-800'}`}>
-              {task.title}
-            </span>
+              {/* Titre et temps */}
+              <div className="flex-1 flex flex-col min-w-0">
+                <span className={`text-sm font-medium transition-all ${isDone ? 'line-through text-white/30' : 'text-white/90'}`}>
+                  {task.title}
+                </span>
+                {task.estimated_time && (
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <div className="flex items-center gap-1 text-[10px] text-white/40 font-medium">
+                      <Clock size={10} />
+                      <span>{task.estimated_time}</span>
+                    </div>
+                    
+                    {!isDone && (
+                      <div className="flex items-center gap-2">
+                        {runningTaskId === task.id ? (
+                          <span className="text-[10px] font-bold text-violet-400 bg-violet-500/15 px-1.5 py-0.5 rounded animate-pulse">
+                            {formatTime(timeLeft)}
+                          </span>
+                        ) : (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              startTimer(task)
+                            }}
+                            className="flex items-center gap-1 text-[10px] font-bold text-violet-400 hover:text-violet-300 transition-colors"
+                          >
+                            <Play size={10} fill="currentColor" />
+                            <span>COMMENCER</span>
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
 
-            {/* Commentaires */}
-            <div className="flex items-center gap-1 text-gray-400 text-xs">
-              <MessageCircle size={13} />
-              <span>{task.comments}</span>
+              {/* Commentaires */}
+              <div className="flex items-center gap-1 text-white/30 text-xs px-2">
+                <MessageCircle size={13} />
+                <span>{task.comment_count || 0}</span>
+              </div>
+
+              {/* Tags */}
+              <div className="hidden md:flex gap-1.5 ml-2">
+                {task.tags?.map(t => (
+                  <span key={t.id} className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-white/10 text-white/50">
+                    {t.name.toUpperCase()}
+                  </span>
+                ))}
+              </div>
+
+              {/* Tag Catégorie */}
+              <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap ml-2 ${categoryData.color}`}>
+                {categoryData.label.toUpperCase()}
+              </span>
+
+              {/* Bouton Delete */}
+              <button
+                onClick={() => deleteTask(task.id)}
+                className="p-1.5 text-white/20 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+              >
+                <Trash2 size={14} />
+              </button>
             </div>
-
-            {/* Avatars */}
-            <AvatarStack names={task.members} max={3} size="xs" />
-
-            {/* Tag projet */}
-            <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${task.tagColor}`}>
-              {task.tag}
-            </span>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )

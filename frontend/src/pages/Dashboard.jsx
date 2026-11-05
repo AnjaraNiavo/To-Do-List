@@ -1,38 +1,30 @@
-import Sidebar from '../components/Sidebar.jsx'
-import Header from '../components/Header.jsx'
+import { useState } from 'react'
+import AppLayout from '../components/AppLayout.jsx'
 import TodayTasks from '../components/TodayTasks.jsx'
-import Timeline from '../components/Timeline.jsx'
 import TimeManagement from '../components/TimeManagement.jsx'
-import RecentProjects from '../components/RecentProjects.jsx'
+import MiniCalendar from '../components/MiniCalendar.jsx'
 
-export default function Dashboard() {
+export default function Dashboard({ refreshKey: initialRefreshKey }) {
+  const [search, setSearch] = useState('')
+  const [refreshKey, setRefreshKey] = useState(initialRefreshKey || 0)
+
+  const handleUpdate = () => setRefreshKey(prev => prev + 1)
+
   return (
-    <div className="flex min-h-screen bg-surface">
-      {/* Sidebar fixe */}
-      <Sidebar />
-
-      {/* Partie principale scrollable */}
-      <div className="flex-1 flex flex-col min-w-0">
-        <Header title="Dashboard" />
-
-        <main className="flex-1 p-6 overflow-auto">
-          <div className="flex gap-6 max-w-7xl mx-auto">
-
-            {/* Colonne gauche (tâches + timeline) */}
-            <div className="flex-1 min-w-0 flex flex-col">
-              <TodayTasks />
-              <Timeline />
-            </div>
-
-            {/* Colonne droite (stats + projets) */}
-            <div className="w-80 flex-shrink-0 flex flex-col">
-              <TimeManagement />
-              <RecentProjects />
-            </div>
-
+    <AppLayout title="Dashboard" onSearch={setSearch} onUpdate={handleUpdate}>
+      <div className="flex gap-6 max-w-7xl mx-auto">
+        <div className="flex-1 min-w-0 reveal">
+          <TodayTasks search={search} onUpdate={handleUpdate} refreshKey={refreshKey} />
+        </div>
+        <div className="w-80 flex-shrink-0 flex flex-col gap-3">
+          <div className="reveal" style={{ transitionDelay: '100ms' }}>
+            <TimeManagement refreshKey={refreshKey} />
           </div>
-        </main>
+          <div className="reveal" style={{ transitionDelay: '200ms' }}>
+            <MiniCalendar />
+          </div>
+        </div>
       </div>
-    </div>
+    </AppLayout>
   )
 }

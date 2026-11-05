@@ -1,3 +1,6 @@
+import { useState, useEffect } from 'react'
+import api from '../api/axios'
+
 // Sparkline SVG inline
 function Sparkline() {
   const points = [
@@ -28,44 +31,62 @@ function Sparkline() {
             <stop offset="100%" stopColor="#8b6cf5" stopOpacity="0.02" />
           </linearGradient>
         </defs>
-        {/* Fill */}
         <path d={fillD} fill="url(#sparkGrad)" />
-        {/* Line */}
         <path d={d} fill="none" stroke="#8b6cf5" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
           className="sparkline-path"
         />
-        {/* Point highlight */}
         <circle cx={hx} cy={hy} r="5" fill="#8b6cf5" stroke="white" strokeWidth="2.5" />
-        {/* Tooltip */}
-        <g transform={`translate(${hx - 24},${hy - 28})`}>
-          <rect rx="6" width="48" height="20" fill="#1a1a2e" />
-          <text x="24" y="14" textAnchor="middle" fill="white" fontSize="9" fontWeight="600">2h 45m</text>
-        </g>
       </svg>
 
-      {/* Labels jours */}
       <div className="flex justify-between mt-1 px-1">
         {['Mon','Tue','Wed','Thu','Fri'].map(d => (
-          <span key={d} className="text-[10px] text-gray-400 font-medium">{d}</span>
+          <span key={d} className="text-[10px] text-white/30 font-medium">{d}</span>
         ))}
       </div>
     </div>
   )
 }
 
-export default function TimeManagement() {
+export default function TimeManagement({ refreshKey }) {
+  const [stats, setStats] = useState({ 
+    total: 0, completed: 0, completion_pct: 0, pending: 0, in_progress: 0 
+  })
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await api.get('/stats/')
+        setStats(res.data)
+      } catch (err) {
+        console.error(err)
+      }
+    }
+    fetchStats()
+  }, [refreshKey])
+
   return (
     <div className="card fade-in">
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-base font-bold text-gray-900">Time Management</h2>
-        <span className="text-xs bg-emerald-100 text-emerald-600 font-semibold px-2 py-1 rounded-full">This week</span>
+      <div className="flex items-center justify-between mb-2">
+        <h2 className="text-sm font-bold text-white">Statistiques</h2>
+        <span className="text-[10px] bg-emerald-500/15 text-emerald-400 font-semibold px-1.5 py-0.5 rounded-full">Global</span>
       </div>
 
-      <div className="flex items-end gap-3 mb-4">
-        <span className="text-3xl font-extrabold text-gray-900">7h 28m</span>
-        <span className="text-sm font-semibold text-emerald-500 mb-1 flex items-center gap-0.5">
-          ↑ +27m
+      <div className="flex items-end gap-2 mb-2">
+        <span className="text-2xl font-extrabold text-white">{stats.completion_pct}%</span>
+        <span className="text-[10px] font-semibold text-emerald-400 mb-1 flex items-center gap-0.5">
+          Terminées
         </span>
+      </div>
+      
+      <div className="grid grid-cols-2 gap-2 mb-3">
+        <div className="bg-white/5 p-2 rounded-xl border border-dark">
+          <p className="text-[9px] font-bold text-white/40 uppercase mb-0.5">Total</p>
+          <p className="text-base font-bold text-white">{stats.total || 0}</p>
+        </div>
+        <div className="bg-white/5 p-2 rounded-xl border border-dark">
+          <p className="text-[9px] font-bold text-white/40 uppercase mb-0.5">En cours</p>
+          <p className="text-base font-bold text-white">{(stats.in_progress || 0) + (stats.pending || 0)}</p>
+        </div>
       </div>
 
       <Sparkline />
